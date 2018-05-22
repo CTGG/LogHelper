@@ -52,10 +52,6 @@ public class CriticalOpeLoggingUtil {
                         psiMethod.addBefore(logstmt,firstStatement);
                     }
 
-
-
-
-
                     //add return
                     PsiType returnType = psiMethod.getReturnType();
                     if (returnType != PsiType.VOID){
