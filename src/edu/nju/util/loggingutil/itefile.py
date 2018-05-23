@@ -55,6 +55,34 @@ def getSeq(type):
         res.append(pair[0][1:])
     return res
 
+def getPercent(type):
+
+    s = getStmts()
+    dicts = typeWithLevel(s)
+    levelfreqpair = {}
+    od = collections.OrderedDict(sorted(dicts.items()))
+    total = 0
+    for k, v in od.iteritems():
+        if type in k[0].lower():
+            if k[1].lower() not in levelfreqpair.keys():
+                levelfreqpair[k[1].lower()] = v
+            else:
+                levelfreqpair[k[1].lower()] = levelfreqpair[k[1].lower()] + v
+    odlevelfreqpair = sorted(levelfreqpair.items(), key=lambda d: d[1], reverse=True)
+
+    total = 0.0
+    for pair in odlevelfreqpair:
+        total = total + pair[1]
+    res = []
+    print odlevelfreqpair
+    for i in range(0,len(odlevelfreqpair)):
+        pair = odlevelfreqpair[i]
+        print pair
+        percent = "%.3f" % (pair[1]/total)
+        print percent
+        res.append(pair[0][1:]+':'+percent)
+    return res
+
 
 
 
