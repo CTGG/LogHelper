@@ -153,4 +153,80 @@ public class QuickFixFactoryImpl implements QuickFixFactory {
             }
         };
     }
+
+    @Override
+    public LocalQuickFix createTryStmtQuickFix(String logLevel, String logMessage, String quickFixName) {
+        String message;
+        if(logMessage==null|| logMessage.equals("")){
+            message= "try:";
+        }
+        else{
+            message= logMessage;
+        }
+        return new LocalQuickFix() {
+            @NotNull
+            public String getName() {
+                return quickFixName;
+            }
+
+            @Nls
+            @NotNull
+            @Override
+            public String getFamilyName() {
+                return getName();
+            }
+
+            @Override
+            public void applyFix(@NotNull Project project, @NotNull ProblemDescriptor problemDescriptor) {
+                PsiTryStatement psiTryStatement= (PsiTryStatement) problemDescriptor.getPsiElement();
+                PsiElementFactory factory = JavaPsiFacade.getInstance(project).getElementFactory();
+                String expression="";
+                expression="log."+logLevel+"(\""+ message+"\");";
+                PsiExpressionStatement logStatement= (PsiExpressionStatement) factory.createStatementFromText(expression, null);
+                if(psiTryStatement.getTryBlock()==null){
+                    LOG.error("try语句不完整");
+                    return;
+                }
+                setLogMethod(psiTryStatement.getTryBlock(),logStatement);
+            }
+        };
+    }
+
+    @Override
+    public LocalQuickFix createForeachStmtQuickFix(String logLevel, String logMessage, String quickFixName) {
+        String message;
+        if(logMessage==null|| logMessage.equals("")){
+            message= "go into foreach loop:";
+        }
+        else{
+            message= logMessage;
+        }
+        return new LocalQuickFix() {
+            @NotNull
+            public String getName() {
+                return quickFixName;
+            }
+
+            @Nls
+            @NotNull
+            @Override
+            public String getFamilyName() {
+                return getName();
+            }
+
+            @Override
+            public void applyFix(@NotNull Project project, @NotNull ProblemDescriptor problemDescriptor) {
+                PsiForeachStatement psiForeachStatement= (PsiForeachStatement) problemDescriptor.getPsiElement();
+                PsiElementFactory factory = JavaPsiFacade.getInstance(project).getElementFactory();
+                String expression="";
+                expression="log."+logLevel+"(\""+ message+"\");";
+                PsiExpressionStatement logStatement= (PsiExpressionStatement) factory.createStatementFromText(expression, null);
+                if(psiForeachStatement.getBody()==null){
+                    LOG.error("foreach语句不完整");
+                    return;
+                }
+                setLogMethod(((PsiBlockStatement)psiForeachStatement.getBody()).getCodeBlock(),logStatement);
+            }
+        };
+    }
 }
