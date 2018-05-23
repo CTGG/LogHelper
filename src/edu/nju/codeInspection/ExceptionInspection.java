@@ -2,19 +2,23 @@ package edu.nju.codeInspection;
 
 
 import com.intellij.codeInsight.daemon.GroupNames;
-import com.intellij.codeInsight.template.Expression;
-import com.intellij.codeInsight.template.ExpressionContext;
-import com.intellij.codeInspection.*;
-import com.intellij.lang.PsiBuilder;
-import com.intellij.lang.impl.PsiBuilderImpl;
-import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.project.Project;
+import com.intellij.codeInspection.BaseJavaLocalInspectionTool;
+import com.intellij.codeInspection.LocalQuickFix;
+import com.intellij.codeInspection.ProblemsHolder;
 import com.intellij.psi.*;
-import com.intellij.psi.impl.source.tree.PsiWhiteSpaceImpl;
-import com.intellij.psi.impl.source.tree.java.PsiJavaTokenImpl;
-import com.intellij.psi.tree.IElementType;
-import edu.nju.livetemplates.ResolveLoggerInstance;
-import org.jetbrains.annotations.Nls;
+import edu.nju.quickfixes.javalogging.configlogging.ExceptionJavaConfigQuickfix;
+import edu.nju.quickfixes.javalogging.finelogging.ExceptionJavaFineQuickfix;
+import edu.nju.quickfixes.javalogging.finerllogging.ExceptionJavaFinerQuickfix;
+import edu.nju.quickfixes.javalogging.finestlogging.ExceptionJavaFinestQuickfix;
+import edu.nju.quickfixes.javalogging.infologging.ExceptionJavaInfoQuickfix;
+import edu.nju.quickfixes.javalogging.severelogging.ExceptionJavaSevereQuickfix;
+import edu.nju.quickfixes.javalogging.warnlogging.ExceptionJavaWarningQuickfix;
+import edu.nju.quickfixes.log4jcommonslogging.fatallogging.ExceptionLog4jFatalQuickfix;
+import edu.nju.quickfixes.slf4jlog4jcommonslogging.debuglogging.ExceptionSlf4jDebugQuickfix;
+import edu.nju.quickfixes.slf4jlog4jcommonslogging.errorlogging.ExceptionSlf4jErrorQuickfix;
+import edu.nju.quickfixes.slf4jlog4jcommonslogging.infologging.ExceptionSlf4jInfoQuickfix;
+import edu.nju.quickfixes.slf4jlog4jcommonslogging.tracelogging.ExceptionSlf4jTraceQuickfix;
+import edu.nju.quickfixes.slf4jlog4jcommonslogging.warnlogging.ExceptionSlf4jWarnQuickfix;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 
@@ -22,8 +26,22 @@ import java.util.Objects;
 
 
 public class ExceptionInspection extends BaseJavaLocalInspectionTool {
-    private static final Logger LOG = Logger.getInstance("#edu.nju.codeInspection.ExceptionInspection");
-    private final LocalQuickFix myQuickFix = new MyQuickFix();
+
+    private final LocalQuickFix exceptionJavaConfigQuickfix = new ExceptionJavaConfigQuickfix();
+    private final LocalQuickFix exceptionJavaInfoQuickfix= new ExceptionJavaInfoQuickfix();
+    private final LocalQuickFix exceptionJavaFineQuickfix = new ExceptionJavaFineQuickfix();
+    private final LocalQuickFix exceptionJavaFinerQuickfix = new ExceptionJavaFinerQuickfix();
+    private final LocalQuickFix exceptionJavaFinestQuickfix = new ExceptionJavaFinestQuickfix();
+    private final LocalQuickFix exceptionJavaSevereQuickfix = new ExceptionJavaSevereQuickfix();
+    private final LocalQuickFix exceptionJavaWarningQuickfix = new ExceptionJavaWarningQuickfix();
+    private final LocalQuickFix exceptionLog4jFatalQuickfix = new ExceptionLog4jFatalQuickfix();
+    private final LocalQuickFix exceptionSlf4jDebugQuickfix = new ExceptionSlf4jDebugQuickfix();
+    private final LocalQuickFix exceptionSlf4jErrorQuickfix = new ExceptionSlf4jErrorQuickfix();
+    private final LocalQuickFix exceptionSlf4jInfoQuickfix = new ExceptionSlf4jInfoQuickfix();
+    private final LocalQuickFix exceptionSlf4jTraceQuickfix = new ExceptionSlf4jTraceQuickfix();
+    private final LocalQuickFix exceptionSlf4jWarnQuickfix = new ExceptionSlf4jWarnQuickfix();
+
+
 
     @SuppressWarnings({"WeakAccess"})
     @NonNls
@@ -74,45 +92,14 @@ public class ExceptionInspection extends BaseJavaLocalInspectionTool {
                         }
                     }
                 }
-                holder.registerProblem(section, DESCRIPTION_TEMPLATE, myQuickFix);
+                holder.registerProblem(section, DESCRIPTION_TEMPLATE, exceptionJavaConfigQuickfix,exceptionJavaInfoQuickfix,exceptionJavaFineQuickfix, exceptionJavaFinerQuickfix,
+                        exceptionJavaFinestQuickfix, exceptionJavaSevereQuickfix, exceptionJavaWarningQuickfix, exceptionLog4jFatalQuickfix,
+                        exceptionSlf4jDebugQuickfix, exceptionSlf4jErrorQuickfix, exceptionSlf4jInfoQuickfix, exceptionSlf4jTraceQuickfix, exceptionSlf4jWarnQuickfix);
+
             }
         };
     }
 
-    private static class MyQuickFix implements LocalQuickFix {
-        @NotNull
-        public String getName() {
-            return "添加log语句";
-        }
-
-        @Nls
-        @NotNull
-        @Override
-        public String getFamilyName() {
-            return getName();
-        }
-
-        @Override
-        public void applyFix(@NotNull Project project, @NotNull ProblemDescriptor problemDescriptor) {
-            PsiCatchSection psiCatchSection = (PsiCatchSection) problemDescriptor.getPsiElement();
-            PsiElementFactory factory = JavaPsiFacade.getInstance(project).getElementFactory();
-            String exceptionTypeName = "";
-            String exceptionName = "";
-            if (psiCatchSection.getCatchType() != null && psiCatchSection.getParameter() != null) {
-                exceptionTypeName = psiCatchSection.getCatchType().getCanonicalText();
-                exceptionName = psiCatchSection.getParameter().getName();
-            }
-            PsiExpressionStatement logStatement= (PsiExpressionStatement) factory.createStatementFromText("log.error(\"" + exceptionTypeName + "\"+" + exceptionName + "+\"\");",null);
-            PsiCodeBlock catchBlock = psiCatchSection.getCatchBlock();
-            if(catchBlock==null){
-                LOG.error("catchBlock is null");
-            }
-            else{
-                logStatement= (PsiExpressionStatement) catchBlock.getFirstBodyElement().replace(logStatement);
-//                LOG.info(new ResolveLoggerInstance().calculateResult(new Expression[0], (ExpressionContext) logStatement.getContext()).toString());
-            }
-        }
-    }
 
     public boolean isEnabledByDefault() {
         return true;

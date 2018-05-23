@@ -21,6 +21,19 @@ import com.intellij.psi.search.SearchScope;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.ui.DocumentAdapter;
 import com.intellij.util.IncorrectOperationException;
+import edu.nju.quickfixes.javalogging.configlogging.BranchJavaConfigQuickfix;
+import edu.nju.quickfixes.javalogging.finelogging.BranchJavaFineQuickfix;
+import edu.nju.quickfixes.javalogging.finerllogging.BranchJavaFinerQuickfix;
+import edu.nju.quickfixes.javalogging.finestlogging.BranchJavaFinestQuickfix;
+import edu.nju.quickfixes.javalogging.infologging.BranchJavaInfoQuickfix;
+import edu.nju.quickfixes.javalogging.severelogging.BranchJavaSevereQuickfix;
+import edu.nju.quickfixes.javalogging.warnlogging.BranchJavaWarningQuickfix;
+import edu.nju.quickfixes.log4jcommonslogging.fatallogging.BranchLog4jFatalQuickfix;
+import edu.nju.quickfixes.slf4jlog4jcommonslogging.debuglogging.BranchSlf4jDebugQuickfix;
+import edu.nju.quickfixes.slf4jlog4jcommonslogging.errorlogging.BranchSlf4jErrorQuickfix;
+import edu.nju.quickfixes.slf4jlog4jcommonslogging.infologging.BranchSlf4jInfoQuickfix;
+import edu.nju.quickfixes.slf4jlog4jcommonslogging.tracelogging.BranchSlf4jTraceQuickfix;
+import edu.nju.quickfixes.slf4jlog4jcommonslogging.warnlogging.BranchSlf4jWarnQuickfix;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -28,6 +41,7 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import java.awt.*;
+import java.util.Objects;
 import java.util.StringTokenizer;
 
 
@@ -36,9 +50,21 @@ import java.util.StringTokenizer;
  * if if-else switch
  */
 public class BranchStatementsInspection extends BaseJavaLocalInspectionTool {
-    private static final Logger LOG = Logger.getInstance("#com.com.intellij.codeInspection.BranchStatementsInspection");
 
-    private final LocalQuickFix myQuickFix = new MyQuickFix();
+    private final LocalQuickFix branchJavaConfigQuickfix = new BranchJavaConfigQuickfix();
+    private final LocalQuickFix branchJavaInfoQuickfix= new BranchJavaInfoQuickfix();
+    private final LocalQuickFix branchJavaFineQuickfix = new BranchJavaFineQuickfix();
+    private final LocalQuickFix branchJavaFinerQuickfix = new BranchJavaFinerQuickfix();
+    private final LocalQuickFix branchJavaFinestQuickfix = new BranchJavaFinestQuickfix();
+    private final LocalQuickFix branchJavaSevereQuickfix = new BranchJavaSevereQuickfix();
+    private final LocalQuickFix branchJavaWarningQuickfix = new BranchJavaWarningQuickfix();
+    private final LocalQuickFix branchLog4jFatalQuickfix = new BranchLog4jFatalQuickfix();
+    private final LocalQuickFix branchSlf4jDebugQuickfix = new BranchSlf4jDebugQuickfix();
+    private final LocalQuickFix branchSlf4jErrorQuickfix = new BranchSlf4jErrorQuickfix();
+    private final LocalQuickFix branchSlf4jInfoQuickfix = new BranchSlf4jInfoQuickfix();
+    private final LocalQuickFix branchSlf4jTraceQuickfix = new BranchSlf4jTraceQuickfix();
+    private final LocalQuickFix branchSlf4jWarnQuickfix = new BranchSlf4jWarnQuickfix();
+
 
     @SuppressWarnings({"WeakerAccess"})
     @NonNls
@@ -56,7 +82,6 @@ public class BranchStatementsInspection extends BaseJavaLocalInspectionTool {
     public String getGroupDisplayName() {
         return GroupNames.BUGS_GROUP_NAME;
     }
-
     //对应html
 
     @NotNull
@@ -64,28 +89,10 @@ public class BranchStatementsInspection extends BaseJavaLocalInspectionTool {
         return "BranchStatements";
     }
 
-    private boolean isCheckedType(PsiType type) {
-        if (!(type instanceof PsiClassType)) return false;
-
-        StringTokenizer tokenizer = new StringTokenizer(CHECKED_CLASSES, ";");
-        while (tokenizer.hasMoreTokens()) {
-            String className = tokenizer.nextToken();
-            if (type.equalsToText(className)) return true;
-        }
-
-        return false;
-    }
-
     @NotNull
     @Override
     public PsiElementVisitor buildVisitor(@NotNull final ProblemsHolder holder, boolean isOnTheFly) {
         return new JavaElementVisitor() {
-
-            @Override
-            public void visitReferenceExpression(PsiReferenceExpression psiReferenceExpression) {
-
-            }
-
 
             /**
              *
@@ -110,68 +117,35 @@ public class BranchStatementsInspection extends BaseJavaLocalInspectionTool {
                 PsiStatement[] thenbranchs = thenbranch.getCodeBlock().getStatements();
 
                 PsiStatement[] elsebranchs = elsebranch.getCodeBlock().getStatements();
-                //开始报问题
-                holder.registerProblem(expression,
-                            "重要分支语句缺少log", myQuickFix);
 
+                if (findRepeatStatement(thenbranchs, "log") == false || findRepeatStatement(elsebranchs, "log") == false) {
+                    //开始报问题
+                    holder.registerProblem(expression, "重要分支语句缺少log", branchJavaInfoQuickfix, branchJavaConfigQuickfix, branchJavaFineQuickfix, branchJavaFinerQuickfix,
+                            branchJavaFinestQuickfix, branchJavaSevereQuickfix, branchJavaWarningQuickfix, branchLog4jFatalQuickfix,
+                            branchSlf4jDebugQuickfix, branchSlf4jErrorQuickfix, branchSlf4jInfoQuickfix, branchSlf4jTraceQuickfix, branchSlf4jWarnQuickfix);
+
+                }
             }
+
+            //查重复
+            private boolean findRepeatStatement(PsiStatement[] psiStatements,String judgeString){
+                if (psiStatements.length != 0) {
+                    for (PsiStatement psiStatement : psiStatements) {
+                        //判断代码块中是否有log语句
+                        if (psiStatement instanceof PsiExpressionStatement) {
+                            PsiExpression expr = ((PsiExpressionStatement) psiStatement).getExpression();
+                            if (expr instanceof PsiMethodCallExpression) {
+                                if (Objects.requireNonNull(((PsiMethodCallExpression) expr).getMethodExpression().getQualifierExpression()).getText().equals(judgeString)) {
+                                    return true;
+                                }
+                            }
+                        }
+                    }
+                }
+                return false;
+            }
+
         };
-    }
-
-    private static class MyQuickFix implements LocalQuickFix {
-        @NotNull
-        public String getName() {
-            // The test (see the TestThisPlugin class) uses this string to identify the quick fix action.
-//            return InspectionsBundle.message("inspection.comparing.references.use.quickfix");
-
-            return "为重要分支 添加log语句";
-        }
-
-
-        public void applyFix(@NotNull Project project, @NotNull ProblemDescriptor descriptor) {
-            try {
-
-                //获取当下的元素
-                PsiBinaryExpression binaryExpression=(PsiBinaryExpression) descriptor.getPsiElement();
-
-                //获取分支主元素
-                PsiIfStatement ifStatement = (PsiIfStatement)binaryExpression.getParent();
-
-                //暂时支持单层的if-else
-                PsiBlockStatement ifBlock = (PsiBlockStatement) binaryExpression.getNextSibling().getNextSibling();
-                PsiBlockStatement elseBlock = (PsiBlockStatement)ifStatement.getLastChild();
-
-                LogPsiBlockStatement(ifBlock,project);
-                LogPsiBlockStatement(elseBlock,project);
-
-            } catch (IncorrectOperationException e) {
-                LOG.error(e);
-            }
-        }
-
-
-        private void LogPsiBlockStatement(PsiBlockStatement psiBlockStatement,Project project){
-
-            PsiCodeBlock psiCodeBlock = psiBlockStatement.getCodeBlock();
-
-            PsiElementFactory factory = JavaPsiFacade.getInstance(project).getElementFactory();
-
-            PsiExpressionStatement logCall = (PsiExpressionStatement) factory.createStatementFromText("log.info(\"enter please_input_your_branch_name\");",null);
-
-            //如果有log分支，则不打印
-            if(psiCodeBlock==null){
-                LOG.error("psiCodeBlock is null");
-            }
-            else{
-                PsiStatement psiStatement=psiCodeBlock.getStatements()[0];
-                psiCodeBlock.addBefore(logCall,psiStatement);
-            }
-        }
-
-        @NotNull
-        public String getFamilyName() {
-            return getName();
-        }
     }
 
 
