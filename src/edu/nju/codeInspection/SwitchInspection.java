@@ -35,10 +35,12 @@ import edu.nju.quickfixes.slf4jlog4jcommonslogging.tracelogging.BranchSlf4jTrace
 import edu.nju.quickfixes.slf4jlog4jcommonslogging.tracelogging.SwitchSlf4jTraceQuickfix;
 import edu.nju.quickfixes.slf4jlog4jcommonslogging.warnlogging.BranchSlf4jWarnQuickfix;
 import edu.nju.quickfixes.slf4jlog4jcommonslogging.warnlogging.SwitchSlf4jWarnQuickfix;
+import edu.nju.util.LevelSequenceUtil;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
+import java.util.List;
 import java.util.Objects;
 import java.util.StringTokenizer;
 
@@ -130,10 +132,10 @@ public class SwitchInspection extends BaseJavaLocalInspectionTool {
                         }
                     }
                 }
-
-                holder.registerProblem(psiExpression, DESCRIPTION_TEMPLATE, switchJavaConfigQuickfix,switchJavaInfoQuickfix,switchJavaFineQuickfix, switchJavaFinerQuickfix,
-                        switchJavaFinestQuickfix, switchJavaSevereQuickfix, switchJavaWarningQuickfix, switchLog4jFatalQuickfix,
-                        switchSlf4jDebugQuickfix, switchSlf4jErrorQuickfix, switchSlf4jInfoQuickfix, switchSlf4jTraceQuickfix, switchSlf4jWarnQuickfix);
+                List<LocalQuickFix> quickFixes = LevelSequenceUtil.getQuickfixSequence("edu.nju.codeInspection.ExceptionInspection","switch","switch");
+                for (LocalQuickFix quickFix:quickFixes){
+                    holder.registerProblem(psiExpression,DESCRIPTION_TEMPLATE,quickFix);
+                }
 
             }
         };

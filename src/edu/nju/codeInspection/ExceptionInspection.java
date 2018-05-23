@@ -19,9 +19,11 @@ import edu.nju.quickfixes.slf4jlog4jcommonslogging.errorlogging.ExceptionSlf4jEr
 import edu.nju.quickfixes.slf4jlog4jcommonslogging.infologging.ExceptionSlf4jInfoQuickfix;
 import edu.nju.quickfixes.slf4jlog4jcommonslogging.tracelogging.ExceptionSlf4jTraceQuickfix;
 import edu.nju.quickfixes.slf4jlog4jcommonslogging.warnlogging.ExceptionSlf4jWarnQuickfix;
+import edu.nju.util.LevelSequenceUtil;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
 import java.util.Objects;
 
 
@@ -92,9 +94,10 @@ public class ExceptionInspection extends BaseJavaLocalInspectionTool {
                         }
                     }
                 }
-                holder.registerProblem(section, DESCRIPTION_TEMPLATE, exceptionJavaConfigQuickfix,exceptionJavaInfoQuickfix,exceptionJavaFineQuickfix, exceptionJavaFinerQuickfix,
-                        exceptionJavaFinestQuickfix, exceptionJavaSevereQuickfix, exceptionJavaWarningQuickfix, exceptionLog4jFatalQuickfix,
-                        exceptionSlf4jDebugQuickfix, exceptionSlf4jErrorQuickfix, exceptionSlf4jInfoQuickfix, exceptionSlf4jTraceQuickfix, exceptionSlf4jWarnQuickfix);
+                List<LocalQuickFix> quickFixes = LevelSequenceUtil.getQuickfixSequence("edu.nju.codeInspection.ExceptionInspection","catch","exception");
+                for (LocalQuickFix quickFix:quickFixes){
+                    holder.registerProblem(section,DESCRIPTION_TEMPLATE,quickFix);
+                }
 
             }
         };

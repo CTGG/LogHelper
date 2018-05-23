@@ -34,6 +34,7 @@ import edu.nju.quickfixes.slf4jlog4jcommonslogging.errorlogging.BranchSlf4jError
 import edu.nju.quickfixes.slf4jlog4jcommonslogging.infologging.BranchSlf4jInfoQuickfix;
 import edu.nju.quickfixes.slf4jlog4jcommonslogging.tracelogging.BranchSlf4jTraceQuickfix;
 import edu.nju.quickfixes.slf4jlog4jcommonslogging.warnlogging.BranchSlf4jWarnQuickfix;
+import edu.nju.util.LevelSequenceUtil;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -41,8 +42,8 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import java.awt.*;
-import java.util.Objects;
-import java.util.StringTokenizer;
+import java.util.*;
+import java.util.List;
 
 
 /**
@@ -120,9 +121,10 @@ public class BranchStatementsInspection extends BaseJavaLocalInspectionTool {
 
                 if (findRepeatStatement(thenbranchs, "log") == false || findRepeatStatement(elsebranchs, "log") == false) {
                     //开始报问题
-                    holder.registerProblem(expression, "重要分支语句缺少log", branchJavaInfoQuickfix, branchJavaConfigQuickfix, branchJavaFineQuickfix, branchJavaFinerQuickfix,
-                            branchJavaFinestQuickfix, branchJavaSevereQuickfix, branchJavaWarningQuickfix, branchLog4jFatalQuickfix,
-                            branchSlf4jDebugQuickfix, branchSlf4jErrorQuickfix, branchSlf4jInfoQuickfix, branchSlf4jTraceQuickfix, branchSlf4jWarnQuickfix);
+                    List<LocalQuickFix> quickFixes = LevelSequenceUtil.getQuickfixSequence("edu.nju.codeInspection.BranchStatementsInspection","if","critical");
+                    for (LocalQuickFix quickFix:quickFixes){
+                        holder.registerProblem(expression,"重要分支语句缺少log",quickFix);
+                    }
 
                 }
             }
