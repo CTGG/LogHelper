@@ -122,7 +122,8 @@ public class BranchStatementsInspection extends BaseJavaLocalInspectionTool {
                 if (findRepeatStatement(thenbranchs, "log") == false || findRepeatStatement(elsebranchs, "log") == false) {
                     //开始报问题
                     List<LocalQuickFix> quickFixes = LevelSequenceUtil.getQuickfixSequence("edu.nju.codeInspection.BranchStatementsInspection","if","critical");
-                    for (LocalQuickFix quickFix:quickFixes){
+                    for (int i = 0;i<quickFixes.size();++i){
+                        LocalQuickFix quickFix = quickFixes.get(i);
                         holder.registerProblem(expression,"重要分支语句缺少log",quickFix);
                     }
 

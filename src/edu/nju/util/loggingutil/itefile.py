@@ -58,14 +58,3 @@ def getSeq(type):
 
 
 
-
-if __name__=="__main__":
-    # s = getStmts()
-    # dicts = typeWithLevel(s)
-    # od = collections.OrderedDict(sorted(dicts.items()))
-    # for k, v in od.iteritems():
-    #     print(k[0], v)
-    print getSeq('try')
-
-
-

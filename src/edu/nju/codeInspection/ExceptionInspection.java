@@ -95,7 +95,8 @@ public class ExceptionInspection extends BaseJavaLocalInspectionTool {
                     }
                 }
                 List<LocalQuickFix> quickFixes = LevelSequenceUtil.getQuickfixSequence("edu.nju.codeInspection.ExceptionInspection","catch","exception");
-                for (LocalQuickFix quickFix:quickFixes){
+                for (int i = 0;i<quickFixes.size();++i){
+                    LocalQuickFix quickFix = quickFixes.get(i);
                     holder.registerProblem(section,DESCRIPTION_TEMPLATE,quickFix);
                 }
 

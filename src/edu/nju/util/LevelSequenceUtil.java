@@ -56,15 +56,21 @@ public class LevelSequenceUtil {
         List<LocalQuickFix> quickFixes = new ArrayList<>();
         try {
             obj = classc.newInstance();
+            System.out.println(levelseq.size());
             Field[] fields = classc.getDeclaredFields();
             // 这里设置访问权限为true
             for (int i=0; i<levelseq.size();++i){
                 String level = levelseq.get(i);
+                System.out.println(level);
+
                 for (int j=0;j<fields.length;++j){
                     Field field = fields[j];
                     field.setAccessible(true);
+                    System.out.println(field.getName());
                     if (field.getType().toString().contains("LocalQuickFix") && field.getName().toLowerCase().contains(level)&&field.getName().toLowerCase().contains(ope)){
                         quickFixes.add((LocalQuickFix)field.get(obj));
+                        System.out.println("add: "+field.getName());
+
                     }
                 }
             }
@@ -76,7 +82,29 @@ public class LevelSequenceUtil {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        for (int i =0;i<quickFixes.size();++i){
+            System.out.println(quickFixes.get(i).getName());
+        }
         return quickFixes;
+    }
+
+    public static String getPercentStr(String type){
+        Properties properties = new Properties();
+        properties.put("python.home","/Users/chentiange/PycharmProjects/fortest");
+        properties.put("python.console.encoding", "UTF-8");
+        properties.put("python.security.respectJavaAccessibility", "false");
+        properties.put("python.import.os", "false");
+        properties.put("python.import.collections", "false");
+        Properties preprops = System.getProperties();
+        PythonInterpreter.initialize(preprops,properties,new String[0]);
+        PythonInterpreter interpreter =  new PythonInterpreter();
+        interpreter.execfile("/Users/chentiange/PycharmProjects/fortest/itefile.py");
+        PyFunction function = interpreter.get("getPercent",PyFunction.class);
+        PyObject pyObject = function.__call__(new PyString(type));
+        String liststr = pyObject.toString();
+        String res = "recommand "+liststr;
+        return res;
+
     }
 
 }

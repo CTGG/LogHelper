@@ -133,7 +133,8 @@ public class SwitchInspection extends BaseJavaLocalInspectionTool {
                     }
                 }
                 List<LocalQuickFix> quickFixes = LevelSequenceUtil.getQuickfixSequence("edu.nju.codeInspection.ExceptionInspection","switch","switch");
-                for (LocalQuickFix quickFix:quickFixes){
+                for (int i = 0;i<quickFixes.size();++i){
+                    LocalQuickFix quickFix = quickFixes.get(i);
                     holder.registerProblem(psiExpression,DESCRIPTION_TEMPLATE,quickFix);
                 }
 

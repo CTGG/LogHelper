@@ -96,7 +96,8 @@ public class ThreadInspection extends BaseJavaLocalInspectionTool {
                         //check whether need register
                         if(!LoggingUtil.isLogged((PsiStatement) expression.getParent())){
                             List<LocalQuickFix> quickFixes = LevelSequenceUtil.getQuickfixSequence("edu.nju.codeInspection.ThreadInspection","methodcall","thread");
-                            for (LocalQuickFix quickFix:quickFixes){
+                            for (int i = 0;i<quickFixes.size();++i){
+                                LocalQuickFix quickFix = quickFixes.get(i);
                                 holder.registerProblem(expression,"thread operation should be logged",quickFix);
                             }
                         }
@@ -111,10 +112,13 @@ public class ThreadInspection extends BaseJavaLocalInspectionTool {
                     final PsiClass psiClass = method.getContainingClass();
                     final PsiClass father = psiClass.getSuperClass();
                     if (father.getName().equals("Thread") && !LoggingUtil.isLogged((PsiStatement) expression.getParent())){
-                        List<LocalQuickFix> quickFixes = LevelSequenceUtil.getQuickfixSequence("edu.nju.codeInspection.ThreadInspection","methodcall","thread");
-                        for (LocalQuickFix quickFix:quickFixes) {
-                            holder.registerProblem(expression, "thread operation should be logged", quickFix);
-                        }
+//                        List<LocalQuickFix> quickFixes = LevelSequenceUtil.getQuickfixSequence("edu.nju.codeInspection.ThreadInspection","methodcall","thread");
+//                        for (int i = 0;i<quickFixes.size();++i){
+//                            LocalQuickFix quickFix = quickFixes.get(i);
+                            holder.registerProblem(expression, "thread operation should be logged "+LevelSequenceUtil.getPercentStr("methodcall"), threadJavaConfigQuickfix,threadJavaFineQuickfix,threadJavaFinerQuickfix,threadJavaFinestQuickfix,
+                                    threadJavaInfoQuickfix,threadJavaSevereQuickfix,threadJavaWarningQuickfix,threadLog4jFatalQuickfix,threadSlf4jDebugQuickfix,threadSlf4jErrorQuickfix,threadSlf4jInfoQuickfix,
+                                    threadSlf4jTraceQuickfix,threadSlf4jWarnQuickfix);
+//                        }
                     }
                 }
             }

@@ -131,9 +131,12 @@ public class CriticalOpeInspection extends BaseJavaLocalInspectionTool {
                         final String currentMethodWholeName = currentClassWholeName+":"+method.getName();
                         if (Pattern.matches(line,currentMethodWholeName)&& isToLog(method)){
                             List<LocalQuickFix> quickFixes = LevelSequenceUtil.getQuickfixSequence("edu.nju.codeInspection.CriticalOpeInspection","method","critical");
-                            for (LocalQuickFix quickFix:quickFixes){
-                                holder.registerProblem(method,"critical ope should be logged",quickFix);
-                            }
+//                            for (int i = 0;i<quickFixes.size();++i){
+//                                LocalQuickFix quickFix = quickFixes.get(i);
+//                                holder.registerProblem(method,"critical ope should be logged",quickFix);
+//                            }
+                            holder.registerProblem(method,"critical ope should be logged "+LevelSequenceUtil.getPercentStr("method"),criticalOpeSlf4jDebugQuickfix,criticalOpeJavaInfoQuickfix,criticalOpeSlf4jInfoQuickfix,criticalOpeJavaWarningQuickfix,criticalOpeSlf4jWarnQuickfix,criticalOpeSlf4jErrorQuickfix,criticalOpeSlf4jTraceQuickfix,
+                                    criticalOpeJavaSevereQuickfix,criticalOpeLog4jFatalQuickfix,criticalOpeJavaFineQuickfix,criticalOpeJavaFinerQuickfix,criticalOpeJavaFinestQuickfix,criticalOpeJavaConfigQuickfix);
                         }
                         line = bufferedReader.readLine();
                     }
@@ -150,9 +153,12 @@ public class CriticalOpeInspection extends BaseJavaLocalInspectionTool {
                 super.visitMethod(method);
                 if (isToLog(method)) {
                     List<LocalQuickFix> quickFixes = LevelSequenceUtil.getQuickfixSequence("edu.nju.codeInspection.CriticalOpeInspection","method","critical");
-                    for (LocalQuickFix quickFix:quickFixes){
-                        holder.registerProblem(method,"critical ope should be logged",quickFix);
-                    }
+//                    for (int i = 0;i<quickFixes.size();++i){
+//                        LocalQuickFix quickFix = quickFixes.get(i);
+//                        holder.registerProblem(method,"critical ope should be logged",quickFix);
+//                    }
+                    holder.registerProblem(method,"critical ope should be logged "+LevelSequenceUtil.getPercentStr("method"),criticalOpeSlf4jDebugQuickfix,criticalOpeJavaInfoQuickfix,criticalOpeSlf4jInfoQuickfix,criticalOpeJavaWarningQuickfix,criticalOpeSlf4jWarnQuickfix,criticalOpeSlf4jErrorQuickfix,criticalOpeSlf4jTraceQuickfix,
+                            criticalOpeJavaSevereQuickfix,criticalOpeLog4jFatalQuickfix,criticalOpeJavaFineQuickfix,criticalOpeJavaFinerQuickfix,criticalOpeJavaFinestQuickfix,criticalOpeJavaConfigQuickfix);
                 }
             }
         };

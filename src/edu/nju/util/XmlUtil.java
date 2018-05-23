@@ -12,7 +12,7 @@ import java.util.ArrayList;
 
 public class XmlUtil {
     private  ArrayList<LogContext> logContextArrayList = new ArrayList<>();
-    private static final String XMLPATH="C:\\Users\\77236\\Desktop\\LogHelper\\resources\\LogContext.xml";
+    private static final String XMLPATH="/Users/chentiange/Downloads/LogHelper/resources/LogContext.xml";
     /**
      * xml文件配置转换为对象
      * @param xmlPath  xml文件路径

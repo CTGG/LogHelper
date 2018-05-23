@@ -7,7 +7,7 @@ import javax.swing.*;
 
 public class ConfigFrom {
     public JPanel mainPanel;
-    public JComboBox<String> defaultFrameworkName;
+    public JComboBox<String> defaultFrameworkName=new JComboBox<>();
 
     public ConfigFrom() {
         for(LogFrameworkDefaults logFrameworkDefaults: LogHelperProjectService.getInstance().getProjectConfiguration().getLogFrameworkDefaults())
