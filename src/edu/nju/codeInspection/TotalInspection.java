@@ -67,6 +67,20 @@ public class TotalInspection extends BaseJavaLocalInspectionTool {
             public void visitTryStatement(PsiTryStatement statement) {
                 //TryStmt
                 super.visitTryStatement(statement);
+                PsiCodeBlock psiCodeBlock=statement.getTryBlock();
+                PsiStatement[] psiStatements = psiCodeBlock.getStatements();
+                if(!checkLogMethodExist(psiStatements)){
+                    for(LogContext logContext:logContexts){
+                        if(logContext.getTypeName().equals("TryStmt")){
+                            List<String> keywords=logContext.getKeyWord();
+                            String logMessage=logContext.getLogTemplate();
+                            if(checkKeyWords(statement.getText(),keywords)){
+                                holder.registerProblem(statement, logContext.getDescriptionTemplate(),
+                                        factory.createTryStmtQuickFix(logContext.getDefaultLogLevel(),logMessage,logContext.getQuickFixName()));
+                            }
+                        }
+                    }
+                }
             }
 
             @Override
@@ -83,6 +97,25 @@ public class TotalInspection extends BaseJavaLocalInspectionTool {
                             if(checkKeyWords(statement.getText(),keywords)){
                                 holder.registerProblem(statement, logContext.getDescriptionTemplate(),
                                         factory.createIfStmtQuickFix(logContext.getDefaultLogLevel(),logMessage,logContext.getQuickFixName()));
+                            }
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void visitForeachStatement(PsiForeachStatement statement){
+                super.visitForeachStatement(statement);
+                PsiCodeBlock psiCodeBlock=((PsiBlockStatement)statement.getBody()).getCodeBlock();
+                PsiStatement[] psiStatements = psiCodeBlock.getStatements();
+                if(!checkLogMethodExist(psiStatements)){
+                    for(LogContext logContext:logContexts){
+                        if(logContext.getTypeName().equals("ForeachStmt")){
+                            List<String> keywords=logContext.getKeyWord();
+                            String logMessage=logContext.getLogTemplate();
+                            if(checkKeyWords(psiCodeBlock.getText(),keywords)){
+                                holder.registerProblem(psiCodeBlock, logContext.getDescriptionTemplate(),
+                                        factory.createMethodDeclarationQuickFix(logContext.getDefaultLogLevel(),logMessage,logContext.getQuickFixName()));
                             }
                         }
                     }
