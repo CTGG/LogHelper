@@ -5,6 +5,7 @@ import com.intellij.codeInspection.BaseJavaLocalInspectionTool;
 import com.intellij.codeInspection.LocalQuickFix;
 import com.intellij.codeInspection.ProblemsHolder;
 import com.intellij.psi.util.PsiUtil;
+import edu.nju.util.LevelSequenceUtil;
 import edu.nju.util.loggingutil.LoggingUtil;
 import edu.nju.quickfixes.javalogging.configlogging.CriticalOpeJavaConfigQuickfix;
 import edu.nju.quickfixes.javalogging.finelogging.CriticalOpeJavaFineQuickfix;
@@ -27,6 +28,7 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.List;
 import java.util.regex.Pattern;
 
 
@@ -128,9 +130,10 @@ public class CriticalOpeInspection extends BaseJavaLocalInspectionTool {
                         final String currentClassWholeName = LoggingUtil.getCurrentClassWholeName(currentFileClass);
                         final String currentMethodWholeName = currentClassWholeName+":"+method.getName();
                         if (Pattern.matches(line,currentMethodWholeName)&& isToLog(method)){
-                            holder.registerProblem(method,DESCRIPTION_TEMPLATE,criticalOpeJavaInfoQuickfix, criticalOpeJavaConfigQuickfix,criticalOpeJavaFineQuickfix,criticalOpeJavaFinerQuickfix,
-                                    criticalOpeJavaFinestQuickfix, criticalOpeJavaSevereQuickfix, criticalOpeJavaWarningQuickfix,criticalOpeLog4jFatalQuickfix,
-                                    criticalOpeSlf4jDebugQuickfix,criticalOpeSlf4jErrorQuickfix,criticalOpeSlf4jInfoQuickfix,criticalOpeSlf4jTraceQuickfix,criticalOpeSlf4jWarnQuickfix);
+                            List<LocalQuickFix> quickFixes = LevelSequenceUtil.getQuickfixSequence("edu.nju.codeInspection.CriticalOpeInspection","method","critical");
+                            for (LocalQuickFix quickFix:quickFixes){
+                                holder.registerProblem(method,"critical ope should be logged",quickFix);
+                            }
                         }
                         line = bufferedReader.readLine();
                     }
@@ -146,9 +149,10 @@ public class CriticalOpeInspection extends BaseJavaLocalInspectionTool {
             private void visitMethodInClass(PsiMethod method) {
                 super.visitMethod(method);
                 if (isToLog(method)) {
-                    holder.registerProblem(method, DESCRIPTION_TEMPLATE, criticalOpeJavaInfoQuickfix, criticalOpeJavaConfigQuickfix, criticalOpeJavaFineQuickfix, criticalOpeJavaFinerQuickfix,
-                            criticalOpeJavaFinestQuickfix, criticalOpeJavaSevereQuickfix, criticalOpeJavaWarningQuickfix, criticalOpeLog4jFatalQuickfix,
-                            criticalOpeSlf4jDebugQuickfix, criticalOpeSlf4jErrorQuickfix, criticalOpeSlf4jInfoQuickfix, criticalOpeSlf4jTraceQuickfix, criticalOpeSlf4jWarnQuickfix);
+                    List<LocalQuickFix> quickFixes = LevelSequenceUtil.getQuickfixSequence("edu.nju.codeInspection.CriticalOpeInspection","method","critical");
+                    for (LocalQuickFix quickFix:quickFixes){
+                        holder.registerProblem(method,"critical ope should be logged",quickFix);
+                    }
                 }
             }
         };

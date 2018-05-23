@@ -18,8 +18,11 @@ import edu.nju.quickfixes.slf4jlog4jcommonslogging.infologging.ThreadSlf4jInfoQu
 import edu.nju.quickfixes.slf4jlog4jcommonslogging.tracelogging.ThreadSlf4jTraceQuickfix;
 import edu.nju.quickfixes.slf4jlog4jcommonslogging.warnlogging.ThreadSlf4jWarnQuickfix;
 import com.intellij.psi.*;
+import edu.nju.util.LevelSequenceUtil;
 import edu.nju.util.loggingutil.LoggingUtil;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
 
 
 /**
@@ -92,9 +95,10 @@ public class ThreadInspection extends BaseJavaLocalInspectionTool {
                     if (isThread(expression)){
                         //check whether need register
                         if(!LoggingUtil.isLogged((PsiStatement) expression.getParent())){
-                            holder.registerProblem(expression,
-                                    DESCRIPTION_TEMPLATE, threadJavaInfoQuickfix,threadJavaFineQuickfix,threadJavaFinerQuickfix,threadJavaFinestQuickfix,threadJavaConfigQuickfix,threadJavaWarningQuickfix,threadJavaSevereQuickfix,
-                                    threadLog4jFatalQuickfix,threadSlf4jDebugQuickfix,threadSlf4jErrorQuickfix,threadSlf4jInfoQuickfix,threadSlf4jTraceQuickfix,threadSlf4jWarnQuickfix);
+                            List<LocalQuickFix> quickFixes = LevelSequenceUtil.getQuickfixSequence("edu.nju.codeInspection.ThreadInspection","methodcall","thread");
+                            for (LocalQuickFix quickFix:quickFixes){
+                                holder.registerProblem(expression,"thread operation should be logged",quickFix);
+                            }
                         }
 
 
@@ -107,9 +111,10 @@ public class ThreadInspection extends BaseJavaLocalInspectionTool {
                     final PsiClass psiClass = method.getContainingClass();
                     final PsiClass father = psiClass.getSuperClass();
                     if (father.getName().equals("Thread") && !LoggingUtil.isLogged((PsiStatement) expression.getParent())){
-                        holder.registerProblem(expression,
-                                DESCRIPTION_TEMPLATE,threadJavaInfoQuickfix,threadJavaFineQuickfix,threadJavaFinerQuickfix,threadJavaFinestQuickfix,threadJavaConfigQuickfix,threadJavaWarningQuickfix,threadJavaSevereQuickfix,
-                                threadLog4jFatalQuickfix,threadSlf4jDebugQuickfix,threadSlf4jErrorQuickfix,threadSlf4jInfoQuickfix,threadSlf4jTraceQuickfix,threadSlf4jWarnQuickfix);
+                        List<LocalQuickFix> quickFixes = LevelSequenceUtil.getQuickfixSequence("edu.nju.codeInspection.ThreadInspection","methodcall","thread");
+                        for (LocalQuickFix quickFix:quickFixes) {
+                            holder.registerProblem(expression, "thread operation should be logged", quickFix);
+                        }
                     }
                 }
             }

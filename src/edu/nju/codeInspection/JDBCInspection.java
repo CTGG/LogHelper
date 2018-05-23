@@ -58,9 +58,11 @@ import edu.nju.quickfixes.slf4jlog4jcommonslogging.warnlogging.JDBCConnectionSlf
 import edu.nju.quickfixes.slf4jlog4jcommonslogging.warnlogging.JDBCExecuteSlf4jWarnQuickfix;
 import edu.nju.quickfixes.slf4jlog4jcommonslogging.warnlogging.JDBCQuerySlf4jWarnQuickfix;
 import edu.nju.quickfixes.slf4jlog4jcommonslogging.warnlogging.JDBCUpdateSlf4jWarnQuickfix;
+import edu.nju.util.LevelSequenceUtil;
 import edu.nju.util.loggingutil.LoggingUtil;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
 
 
 /**
@@ -184,9 +186,10 @@ public class JDBCInspection extends BaseJavaLocalInspectionTool {
                                 final PsiClass containingClass = method.getContainingClass();
                                 final String className = containingClass.getQualifiedName();
                                 if (className != null && className.equals("java.sql.DriverManager")&& !LoggingUtil.isLogged((PsiStatement) expression.getParent())) {
-                                    holder.registerProblem(expression, DESCRIPTION_TEMPLATE, jdbcConnectionJavaConfigQuickfix,jdbcConnectionJavaFineQuickfix,jdbcConnectionJavaFinerQuickfix,jdbcConnectionJavaFinestQuickfix,
-                                            jdbcConnectionJavaInfoQuickfix,jdbcConnectionJavaSevereQuickfix,jdbcConnectionJavaWarningQuickfix,jdbcConnectionLog4jFatalQuickfix,
-                                            jdbcConnectionSlf4jDebugQuickfix, jdbcConnectionSlf4jErrorQuickfix,jdbcConnectionSlf4jInfoQuickfix,jdbcConnectionSlf4jTraceQuickfix,jdbcConnectionSlf4jWarnQuickfix);
+                                    List<LocalQuickFix> quickFixes = LevelSequenceUtil.getQuickfixSequence("edu.nju.codeInspection.JDBCInspection","methodcall","connection");
+                                    for (LocalQuickFix quickFix:quickFixes){
+                                        holder.registerProblem(expression,"jdbc connection should be logged",quickFix);
+                                    }
                                 }
                             }
                         }
@@ -216,9 +219,10 @@ public class JDBCInspection extends BaseJavaLocalInspectionTool {
                                     final PsiClass queryClass = queryMethod.getContainingClass();
                                     final String fullClassName = queryClass.getQualifiedName();
                                     if (fullClassName != null && fullClassName.equals("java.sql.Statement") &&!LoggingUtil.isLogged(statement)) {
-                                        holder.registerProblem(statement, DESCRIPTION_TEMPLATE, jdbcQueryJavaInfoQuickfix,jdbcQueryJavaConfigQuickfix,jdbcQueryJavaFineQuickfix,jdbcQueryJavaFinerQuickfix,
-                                                jdbcQueryJavaFinestQuickfix,jdbcQueryJavaSevereQuickfix,jdbcQueryJavaWarnQuickfix,jdbcQueryLog4jFatalQuickfix,
-                                                jdbcQuerySlf4jDebugQuickfix,jdbcQuerySlf4jErrorQuickfix,jdbcQuerySlf4jInfoQuickfix,jdbcQuerySlf4jTraceQuickfix,jdbcQuerySlf4jWarnQuickfix);
+                                        List<LocalQuickFix> quickFixes = LevelSequenceUtil.getQuickfixSequence("edu.nju.codeInspection.JDBCInspection","methodcall","query");
+                                        for (LocalQuickFix quickFix:quickFixes){
+                                            holder.registerProblem(statement,"jdbc query should be logged",quickFix);
+                                        }
                                     }
                                 }
                             }else if (initializer.getType().toString().equals("PsiType:boolean") && initializer instanceof PsiMethodCallExpression) {
@@ -230,9 +234,10 @@ public class JDBCInspection extends BaseJavaLocalInspectionTool {
                                     final PsiClass queryClass = queryMethod.getContainingClass();
                                     final String fullClassName = queryClass.getQualifiedName();
                                     if (fullClassName != null && fullClassName.equals("java.sql.Statement") &&!LoggingUtil.isLogged(statement)) {
-                                        holder.registerProblem(statement, DESCRIPTION_TEMPLATE, jdbcExecuteJavaInfoQuickfix,jdbcExecuteJavaConfigQuickfix,jdbcExecuteJavaFineQuickfix,jdbcExecuteJavaFinerQuickfix,jdbcExecuteJavaFinestQuickfix,
-                                                jdbcExecuteJavaSevereQuickfix,jdbcExecuteJavaWarnQuickfix,jdbcExecuteLog4jFatalQuickfix,jdbcExecuteSlf4jDebugQuickfix,jdbcExecuteSlf4jErrorQuickfix,
-                                                jdbcExecuteSlf4jInfoQuickfix,jdbcExecuteSlf4jTraceQuickfix,jdbcExecuteSlf4jWarnQuickfix);
+                                        List<LocalQuickFix> quickFixes = LevelSequenceUtil.getQuickfixSequence("edu.nju.codeInspection.JDBCInspection","methodcall","execute");
+                                        for (LocalQuickFix quickFix:quickFixes){
+                                            holder.registerProblem(statement,"jdbc execute should be logged",quickFix);
+                                        }
                                     }
                                 }
                             } else if (initializer.getType().toString().equals("PsiType:int") && initializer instanceof PsiMethodCallExpression) {
@@ -244,9 +249,10 @@ public class JDBCInspection extends BaseJavaLocalInspectionTool {
                                     final PsiClass queryClass = queryMethod.getContainingClass();
                                     final String fullClassName = queryClass.getQualifiedName();
                                     if (fullClassName != null && fullClassName.equals("java.sql.Statement") &&!LoggingUtil.isLogged(statement)) {
-                                        holder.registerProblem(statement, DESCRIPTION_TEMPLATE, jdbcUpdateJavaInfoQuickfix,jdbcUpdateJavaConfigQuickfix,jdbcUpdateJavaFineQuickfix,jdbcUpdateJavaFinerQuickfix,jdbcUpdateJavaFinestQuickfix,
-                                                jdbcUpdateJavaSevereQuickfix,jdbcUpdateJavaWarnQuickfix,jdbcUpdateLog4jFatalQuickfix,jdbcUpdateSlf4jDebugQuickfix,
-                                                jdbcUpdateSlf4jErrorQuickfix,jdbcUpdateSlf4jInfoQuickfix,jdbcUpdateSlf4jTraceQuickfix,jdbcUpdateSlf4jWarnQuickfix);
+                                        List<LocalQuickFix> quickFixes = LevelSequenceUtil.getQuickfixSequence("edu.nju.codeInspection.JDBCInspection","methodcall","update");
+                                        for (LocalQuickFix quickFix:quickFixes){
+                                            holder.registerProblem(statement,"jdbc update should be logged",quickFix);
+                                        }
                                     }
                                 }
                             }

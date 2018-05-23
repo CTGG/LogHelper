@@ -1,0 +1,82 @@
+package edu.nju.util;
+
+import com.intellij.codeInspection.LocalQuickFix;
+import org.python.antlr.ast.Print;
+import org.python.core.PyFunction;
+import org.python.core.PyObject;
+import org.python.core.PyString;
+import org.python.util.PythonInterpreter;
+
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
+
+/**
+ * Created by chentiange on 2018/5/22.
+ */
+public class LevelSequenceUtil {
+    private static List<String> getLevelSequence(String type){
+        Properties properties = new Properties();
+        properties.put("python.home","/Users/chentiange/PycharmProjects/fortest");
+        properties.put("python.console.encoding", "UTF-8");
+        properties.put("python.security.respectJavaAccessibility", "false");
+        properties.put("python.import.os", "false");
+        properties.put("python.import.collections", "false");
+        Properties preprops = System.getProperties();
+        PythonInterpreter.initialize(preprops,properties,new String[0]);
+        PythonInterpreter interpreter =  new PythonInterpreter();
+        interpreter.execfile("/Users/chentiange/PycharmProjects/fortest/itefile.py");
+        PyFunction function = interpreter.get("getSeq",PyFunction.class);
+        PyObject pyObject = function.__call__(new PyString(type));
+        String liststr = pyObject.toString();
+        String[] levelparts = liststr.split(",");
+        List<String> res = new ArrayList<>();
+        for (int i= 0;i<levelparts.length;++i){
+            String levelpart = levelparts[i];
+            String temp = levelpart;
+            int firstindex = temp.indexOf("\'");
+            temp = temp.substring(firstindex+1);
+            int secondindex = temp.indexOf("\'");
+            temp = temp.substring(0,secondindex);
+            res.add(temp);
+        }
+        return res;
+    }
+
+    public static List<LocalQuickFix> getQuickfixSequence(String className, String type, String ope){
+        Class<?> classc = null;
+        try {
+            classc = Class.forName(className);
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        Object obj = null;
+        List<String> levelseq = getLevelSequence(type);
+        List<LocalQuickFix> quickFixes = new ArrayList<>();
+        try {
+            obj = classc.newInstance();
+            Field[] fields = classc.getDeclaredFields();
+            // 这里设置访问权限为true
+            for (int i=0; i<levelseq.size();++i){
+                String level = levelseq.get(i);
+                for (int j=0;j<fields.length;++j){
+                    Field field = fields[j];
+                    field.setAccessible(true);
+                    if (field.getType().toString().contains("LocalQuickFix") && field.getName().toLowerCase().contains(level)&&field.getName().toLowerCase().contains(ope)){
+                        quickFixes.add((LocalQuickFix)field.get(obj));
+                    }
+                }
+            }
+            for (int i = 0;i<fields.length;++i){
+                if(fields[i].getType().toString().contains("LocalQuickFix") && !quickFixes.contains((LocalQuickFix)fields[i].get(obj))){
+                    quickFixes.add((LocalQuickFix)fields[i].get(obj));
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return quickFixes;
+    }
+
+}

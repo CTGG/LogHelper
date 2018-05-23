@@ -49,12 +49,9 @@ public class CriticalOpeLoggingUtil {
                 if (oldStatements.length > 0){
                     PsiStatement firstStatement = oldStatements[0];
                     if (!firstStatement.getText().startsWith("log.")){
-                        psiMethod.addBefore(logstmt,firstStatement);
+//                        psiMethod.addBefore(logstmt,firstStatement);
+                        firstStatement.getPrevSibling().replace(logstmt);
                     }
-
-
-
-
 
                     //add return
                     PsiType returnType = psiMethod.getReturnType();
@@ -70,7 +67,8 @@ public class CriticalOpeLoggingUtil {
 
                             PsiExpressionStatement returnst = (PsiExpressionStatement) factory.createStatementFromText(returnlogContent,null);
                             if (!returnStatement.getPrevSibling().getPrevSibling().getText().startsWith("log.")){
-                                psiMethod.addBefore(returnst,returnStatement);
+//                                psiMethod.addBefore(returnst,returnStatement);
+                                returnStatement.getPrevSibling().replace(returnst);
                             }
 
                         }
